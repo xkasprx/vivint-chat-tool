@@ -6,8 +6,7 @@
     <title>FTS Chat Tool</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css">
-    <link rel="shortcut icon"
-        href="https://www.vivint.com/themes/custom/themekit/favicon.ico" />
+    <link rel="shortcut icon" href="https://www.vivint.com/themes/custom/themekit/favicon.ico" />
     <style type="text/css">
         :root {
             --main-bg-color: #25729E;
@@ -369,7 +368,7 @@
             color: var(--color1)
         }
 
-        #snackbar {
+        #popup {
             visibility: hidden;
             min-width: 250px;
             margin-left: -125px;
@@ -384,7 +383,7 @@
             bottom: 30px;
         }
 
-        #snackbar.show {
+        #popup.show {
             visibility: visible;
             -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
             animation: fadein 0.5s, fadeout 0.5s 2.5s;
@@ -550,7 +549,7 @@
             <h1 id="vivintbranding">vivint.SmartHome</h1>
         </span>
         <span class="topbannerbranding">
-            <h2 id="version">Version 2.3.2</h2>
+            <h2 id="version">Version 2.3.3</h2>
         </span>
         <span id="logo">
             <svg width="84" height="19" viewBox="0 0 84 19" xmlns="http://www.w3.org/2000/svg" class="vivint-logo" aria-labelledby="vivint-logo-title" role="img">
@@ -583,10 +582,10 @@
         <div id="favnavdropdown">
             <p onclick="deleteFavorite()">Remove</p>
         </div>
-        <h4 id="fav">Favorites</h4>
+            <h4 id="fav">Favorites</h4>
         <hr>
         <div>
-            <h5 id="favnavempty"><span class="tooltiptext">Right click a button to add to the favorites panel.</span>No Favorites Added Yet</h5>
+            <h5 id="favnavempty"><span class="tooltiptext">Right click a button to add to the favorites panel.</span>No Favorites Added</h5>
         </div>
         <div id="favnavcells">
         </div>
@@ -671,7 +670,7 @@
         <button onclick="confirmExport()">Confirm</button>
         <button class="cancel" onclick="closeDialog()">Cancel</button>
     </dialog>
-    <div id="snackbar"></div>
+    <div id="popup"></div>
     <script>
         function enableLightMode(){
             let element = document.body;
@@ -905,11 +904,11 @@
                 textarea.select();
                 document.execCommand(`copy`);
                 document.body.removeChild(textarea);
-                let snackbar = document.getElementById(`snackbar`);
-                snackbar.innerText = `Copied ${buttonName}${buttonName.charAt(buttonName.length - 1) === `s` ? `'` : `'s`} message to the clipboard!`;
-                snackbar.className = `show`;
+                let popup = document.getElementById(`popup`);
+                popup.innerText = `Copied ${buttonName}${buttonName.charAt(buttonName.length - 1) === `s` ? `'` : `'s`} message to the clipboard!`;
+                popup.className = `show`;
                 setTimeout(function(){
-                    snackbar.className = snackbar.className.replace(`show`, ``);
+                    popup.className = popup.className.replace(`show`, ``);
                 }, 3000);
             }
         };
@@ -979,11 +978,11 @@
                 textarea.select();
                 document.execCommand(`copy`);
                 document.body.removeChild(textarea);
-                let snackbar = document.getElementById(`snackbar`);
-                snackbar.innerText = `Copied ${buttonName}${buttonName.charAt(buttonName.length - 1) === `s` ? `'` : `'s`} message to the clipboard!`;
-                snackbar.className = `show`;
+                let popup = document.getElementById(`popup`);
+                popup.innerText = `Copied ${buttonName}${buttonName.charAt(buttonName.length - 1) === `s` ? `'` : `'s`} message to the clipboard!`;
+                popup.className = `show`;
                 setTimeout(function(){
-                    snackbar.className = snackbar.className.replace(`show`, ``);
+                    popup.className = popup.className.replace(`show`, ``);
                 }, 3000);
             }
         };
