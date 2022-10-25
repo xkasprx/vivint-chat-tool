@@ -1,2 +1,2 @@
 # vivint-chat-tool
-Chat tool for Vivint Field Support
+Quick copy tool for FAST Team
