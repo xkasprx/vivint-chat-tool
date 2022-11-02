@@ -116,7 +116,7 @@
             clear: both;
         }
 
-        /* Classes */
+        /* Class */
         .addButtonButton{
             background-color: var(--color1);
             color: var(--main-bg-color);
@@ -179,12 +179,16 @@
             text-align: center;
         }
 
-        /* ID's */
+        /* ID */
         #addfavbutton{
             z-index: 50;
             background-color: var(--color1);
             color: var(--main-bg-color);
             margin: auto;
+        }
+
+        #contextmenu{
+            background-color: #000000;
         }
 
         #createbuttondialog textarea{
@@ -476,7 +480,6 @@
         #importdialog p,
         #exportdialog p{
             display: inline;
-
         }
 
         #createsectiondialog button,
@@ -656,19 +659,24 @@
     <div id="midempty">
         <h3>No Sections Created</h3>
     </div>
+    <div id="contextmenu">
+        <p>This</p>
+        <hr>
+        <p>That</p>
+    </div>
     <dialog id="createsectiondialog">
         <p>Section Name</p>
-        <input type="text" name="sectionNameInput" id="sectionNameInput" hint="Name" onkeydown="checkEnter()"></input>
+        <input type="text" name="sectionNameInput" id="sectionNameInput" hint="Name" autocomplete="off"></input>
         <hr>
         <button type="submit" onclick="createSection()" id="sectionSubmit">Submit</button>
         <button class="cancel" onclick="closeDialog()">Cancel</button>
     </dialog>
     <dialog id="createbuttondialog">
         <p>Button Name</p>
-        <input type="text" name="buttonNameInput" id="buttonNameInput" hint="Name"></input>
+        <input type="text" name="buttonNameInput" id="buttonNameInput" hint="Name" autocomplete="off"></input>
         <hr>
         <p>Button Value</p>
-        <textarea name="buttonPasteValue" id="buttonPasteValue" hint="Paste Value"></textarea>
+        <textarea name="buttonPasteValue" id="buttonPasteValue" hint="Paste Value" autocomplete="off"></textarea>
         <br>
         <button onclick="createButton()">Submit</button>
         <button class="cancel" onclick="closeDialog()">Cancel</button>
@@ -694,21 +702,24 @@
         <input id="file" type="file" accept="json">
         <script>
             (function(){
-                function onChange(event){
+                let alertText = `File upload failed. Please try again using a valid JSON file.`;
+                let file = document.getElementById(`file`);
+                let sectionNameInput = document.getElementById(`sectionNameInput`);
+
+                function onChange(e){
                     let reader = new FileReader();
                     reader.onload = onReaderLoad;
-                    reader.readAsText(event.target.files[0]);
+                    reader.readAsText(e.target.files[0]);
                 };
 
-                function onReaderLoad(event){
+                function onReaderLoad(e){
                     try{
                         closeDialog();
                         let allSections = JSON.parse(localStorage.allSections);
-                        let newSectionName = document.getElementById("sectionNameInput").value;
-                        JSON.parse(event.target.result).forEach(element =>{
-                            let newSection = JSON.parse(
-                                `{"sectionName": "${JSON.parse(element).sectionName}","sectionButtons": ${JSON.stringify(JSON.parse(element).sectionButtons)}}`
-                            );
+                        let newSectionName = sectionNameInput.value;
+                        JSON.parse(e.target.result).forEach(x =>{
+                            let sectionInfo = `{"sectionName": "${JSON.parse(x).sectionName}","sectionButtons": ${JSON.stringify(JSON.parse(x).sectionButtons)}}`;
+                            let newSection = JSON.parse(sectionInfo);
                             allSections.push(newSection);
                         });
                         localStorage.allSections = JSON.stringify(allSections);
@@ -716,12 +727,12 @@
                         loadSideNav();
                         location.reload();
                     }catch{
-                        alert("File upload failed. Please try again using a valid JSON file.")
+                        alert(alertText);
                         location.reload();
                     }
                 };
                 
-                document.getElementById("file").addEventListener("change", onChange);
+                file.addEventListener(`change`, onChange);
             }());
         </script>
         <br>
@@ -734,18 +745,40 @@
         <button onclick="confirmExport()">Confirm</button>
         <button class="cancel" onclick="closeDialog()">Cancel</button>
     </dialog>
-    <div id="popup"></div>
+    <div id="popup">
+    </div>
     <script>
         let body = document.body;
 
         let lightMode = localStorage.getItem(`lightMode`);
-        let secDialog = document.getElementById(`createsectiondialog`);
-        let butDialog = document.getElementById(`createbuttondialog`);
-        let setdialog = document.querySelector(`#settingsdialog`);
-        let impdialog = document.querySelector(`#importdialog`);
-        let expdialog = document.querySelector(`#exportdialog`);
-        
-        let clearString = `THIS WILL DELETE ALL OF YOUR SECTIONS AND THEIR BUTTONS!\n\nAre you sure you want to delete all sections and all of their buttons?`;
+
+        let buttonNameInput = document.getElementById(`buttonNameInput`);
+        let buttonPasteValue = document.getElementById(`buttonPasteValue`);
+        let createbuttondialog = document.getElementById(`createbuttondialog`);
+        let createsectiondialog = document.getElementById(`createsectiondialog`);
+        let exportdialog = document.getElementById(`exportdialog`);
+        let fav = document.getElementById(`fav`);
+        let favDel = document.getElementById(`favdel`);
+        let favNavCells = document.getElementById(`favnavcells`);
+        let favnavempty = document.getElementById(`favnavempty`);
+        let favnavdropdown = document.getElementById(`favnavdropdown`);
+        let importdialog = document.getElementById(`importdialog`);
+        let logo = document.getElementById(`logo`);
+        let midempty = document.getElementById(`midempty`);
+        let midcontainer = document.getElementById(`midcontainer`);
+        let midnav = document.getElementById(`midnav`);
+        let nav = document.getElementById(`nav`);
+        let popup = document.getElementById(`popup`);
+        let sectionNameInput = document.getElementById(`sectionNameInput`);
+        let settingsdialog = document.getElementById(`settingsdialog`);
+        let settingsbutton = document.getElementById(`settings`);
+        let sideNavCells = document.getElementById(`sidenavcells`);
+        let themebutton = document.getElementById(`themebutton`);
+        let toolBranding = document.getElementById(`toolbranding`);
+        let version = document.getElementById(`version`);
+        let vivintBrandingPosition = document.getElementById(`vivintbranding`);
+
+        let deleteAllString = `THIS WILL DELETE ALL OF YOUR SECTIONS AND THEIR BUTTONS!\n\nAre you sure you want to delete all sections and all of their buttons?`;
 
         function addFavorite(){
             let allSections = JSON.parse(localStorage.allSections);
@@ -758,17 +791,11 @@
             localStorage.favoriteButtons = JSON.stringify(favoriteButtons);
             loadFavNav();
         };
-
-        function checkEnter(){
-            if(event.key == `Enter`){
-                document.getElementById(`sectionSubmit`).click();
-            }
-        }
-
+        
         function clearAll(){
             closeDialog();
 
-            if(confirm(clearString)){
+            if(confirm(deleteAllString)){
                 localStorage.clear();
                 localStorage.allSections = `[]`;
                 localStorage.favoriteButtons = `[]`;
@@ -779,12 +806,11 @@
         };
 
         function closeDialog(){
-
-            secDialog.close();
-            butDialog.close();
-            setdialog.style.display = `none`;
-            impdialog.style.display = `none`;
-            expdialog.style.display = `none`;
+            createsectiondialog.close();
+            createbuttondialog.close();
+            settingsdialog.style.display = `none`;
+            importdialog.style.display = `none`;
+            exportdialog.style.display = `none`;
         }
 
         function confirmExport(){
@@ -796,7 +822,7 @@
 
                 let sections = JSON.parse(localStorage.allSections);
                 sections.forEach(section => exportjson.push(JSON.stringify(section)));
-                saveText(JSON.stringify(exportjson), `chatToolExport.json`)
+                saveText(JSON.stringify(exportjson), `chatToolExport.json`);
                 closeDialog();
                 return;
             }
@@ -809,7 +835,7 @@
                     }
                 });
             });
-            saveText(JSON.stringify(exportjson), `chatToolExport.json`)
+            saveText(JSON.stringify(exportjson), `chatToolExport.json`);
             closeDialog();
         }
 
@@ -820,14 +846,14 @@
                 let pasteValue = allSections[sectionId].sectionButtons[buttonId].pasteValue;
                 let textarea = document.createElement(`textarea`);
                 let buttonName = allSections[sectionId].sectionButtons[buttonId].buttonName;
+                let popupText = `Copied ${buttonName}${buttonName.charAt(buttonName.length - 1) === `s` ? `'` : `'s`} message to the clipboard!`;
+                
                 textarea.value = pasteValue;
                 body.appendChild(textarea);
                 textarea.select();
                 document.execCommand(`copy`);
                 body.removeChild(textarea);
-                let popup = document.getElementById(`popup`);
-                popup.innerText =
-                    `Copied ${buttonName}${buttonName.charAt(buttonName.length - 1) === `s` ? `'` : `'s`} message to the clipboard!`;
+                popup.innerText = popupText;
                 popup.className = `show`;
                 setTimeout(function(){
                     popup.className = popup.className.replace(`show`, ``);
@@ -835,16 +861,15 @@
             }
         };
 
-        function copyPasteButtonRightClicked(i, j){
+        function copyPasteButtonRightClicked(sectionId, buttonId){
             event.preventDefault();
             let mouseX = event.clientX;
             let mouseY = event.clientY;
-            let favDel = document.getElementById(`favdel`);
             favDel.style.left = `${mouseX}px`;
             favDel.style.top = `${mouseY}px`;
             favDel.style.visibility = `visible`;
             favDel.style.display = `block`;
-            localStorage.activeButton = `{"section": "${i}", "button": "${j}"}`;
+            localStorage.activeButton = `{"section": "${sectionId}", "button": "${buttonId}"}`;
             window.addEventListener(`click`, function(){
                 favDel.style.visibility = `hidden`;
                 localStorage.removeItem(`activeButton`);
@@ -853,29 +878,28 @@
 
         function createButton(){
             let allSections = JSON.parse(localStorage.allSections);
-            let newButtonName = document.getElementById(`buttonNameInput`).value;
-            let newButtonDescription = JSON.stringify(document.getElementById(`buttonPasteValue`).value);
+            let newButtonName = buttonNameInput.value;
+            let newButtonDescription = JSON.stringify(buttonPasteValue.value);
             let newButton = JSON.parse(`{"buttonName": "${newButtonName}", "pasteValue": ${newButtonDescription}}`);
             allSections[parseInt(localStorage.activeSection)].sectionButtons.push(newButton);
             localStorage.allSections = JSON.stringify(allSections);
             loadSections();
-            document.getElementById(`buttonNameInput`).value = ``;
-            document.getElementById(`buttonPasteValue`).value = ``;
+            buttonNameInput.value = ``;
+            buttonPasteValue.value = ``;
             localStorage.removeItem(`activeSection`);
             closeDialog();
         };
 
         function createSection(){
             let allSections = JSON.parse(localStorage.allSections);
-            let newSectionName = document.getElementById(`sectionNameInput`).value;
+            let newSectionName = sectionNameInput.value;
             let newSection = JSON.parse(`{"sectionName": "${newSectionName}","sectionButtons": []}`);
             allSections.push(newSection);
             localStorage.allSections = JSON.stringify(allSections);
-            let midempty = document.getElementById(`midempty`);
             midempty.style.visibility = `hidden`;
             loadSections();
             loadSideNav();
-            document.getElementById(`sectionNameInput`).value = ``;
+            sectionNameInput.value = ``;
             closeDialog();
         };
 
@@ -902,18 +926,18 @@
             loadFavNav();
         };
 
-        function deleteSection(id){
+        function deleteSection(sectionId){
             let allSections = JSON.parse(localStorage.allSections);
             let favoriteButtons = JSON.parse(localStorage.favoriteButtons);
-            if(confirm(
-                    `Are you sure you want to delete the section ${allSections[id].sectionName} and all of its buttons?`
-                )){
-                delete allSections[id];
-                allSections.splice(id, 1);
+            let confirmText = `Are you sure you want to delete the section ${allSections[sectionId].sectionName} and all of its buttons?`;
+
+            if(confirm(confirmText)){
+                delete allSections[sectionId];
+                allSections.splice(sectionId, 1);
                 localStorage.allSections = JSON.stringify(allSections);
                 let originalLength = favoriteButtons.length;
                 for (let i = 0; i < originalLength; i++){
-                    if(favoriteButtons[i].sectionId === id){
+                    if(favoriteButtons[i].sectionId === sectionId){
                         delete favoriteButtons[i];
                         favoriteButtons.splice(i, 1);
                         localStorage.favoriteButtons = JSON.stringify(favoriteButtons);
@@ -941,20 +965,22 @@
             for (let i = 0; i < c.length; i++){
                 c[i].remove();
             }
-            let dialog = document.querySelector(`#exportdialog`);
-            dialog.style.display = `block`;
+            exportdialog.style.display = `block`;
             if(!localStorage.allSections || localStorage.allSections != `[]`){
-                let node = document.createElement(`div`)
-                node.className = `checkbox`
-                node.innerHTML =
-                    `<input type="checkbox" class="checkbox" id="allsections" name="allsections" value="allsections"> Select All <hr>`;
-                document.querySelector(`#exportcheckboxes`).appendChild(node);
+                let node = document.createElement(`div`);
                 let allSections = JSON.parse(localStorage.allSections);
+                let allSectionsText = `<input type="checkbox" class="checkbox" id="allsections" name="allsections" value="allsections"> Select All <hr>`;
+
+                node.className = `checkbox`;
+                node.innerHTML = allSectionsText;
+                document.querySelector(`#exportcheckboxes`).appendChild(node);
+
                 allSections.forEach(section =>{
-                    let node = document.createElement(`div`)
+                    let node = document.createElement(`div`);
+                    let sectionName = `<input type="checkbox" class="checkbox" name="section" value="${section.sectionName}"> ${section.sectionName} <hr>`;
+
                     node.className = `checkbox`;
-                    node.innerHTML =
-                        `<input type="checkbox" class="checkbox" name="section" value="${section.sectionName}"> ${section.sectionName} <hr>`;
+                    node.innerHTML = sectionName;
                     document.querySelector(`#exportcheckboxes`).appendChild(node);
                 });
             }else{
@@ -978,21 +1004,21 @@
             });
         }
 
-        function favCellClicked(id){
+        function favCellClicked(buttonId){
             closeDialog();
             let favoriteButtons = JSON.parse(localStorage.favoriteButtons);
             if(event.which === 1){
-                let pasteValue = favoriteButtons[id].pasteValue;
+                let pasteValue = favoriteButtons[buttonId].pasteValue;
                 let textarea = document.createElement(`textarea`);
-                let buttonName = favoriteButtons[id].buttonName;
+                let buttonName = favoriteButtons[buttonId].buttonName;
+                let buttonNameText = `Copied ${buttonName}${buttonName.charAt(buttonName.length - 1) === `s` ? `'` : `'s`} message to the clipboard!`;
+
                 textarea.value = pasteValue;
                 body.appendChild(textarea);
                 textarea.select();
                 document.execCommand(`copy`);
                 body.removeChild(textarea);
-                let popup = document.getElementById(`popup`);
-                popup.innerText =
-                    `Copied ${buttonName}${buttonName.charAt(buttonName.length - 1) === `s` ? `'` : `'s`} message to the clipboard!`;
+                popup.innerText =buttonNameText;
                 popup.className = `show`;
                 setTimeout(function(){
                     popup.className = popup.className.replace(`show`, ``);
@@ -1000,31 +1026,21 @@
             }
         };
 
-        function favRightClicked(id){
+        function favRightClicked(buttonId){
             event.preventDefault();
             let mouseX = window.innerWidth - event.clientX;
             let mouseY = event.clientY - 40;
-            let favDel = document.getElementById(`favnavdropdown`);
-            favDel.style.top = `${mouseY}px`;
-            favDel.style.visibility = `visible`;
-            favDel.style.display = `block`;
-            localStorage.activeFav = `{"button": "${id}"}`;
+            favnavdropdown.style.top = `${mouseY}px`;
+            favnavdropdown.style.visibility = `visible`;
+            favnavdropdown.style.display = `block`;
+            localStorage.activeFav = `{"button": "${buttonId}"}`;
             window.addEventListener(`click`, function(){
-                favDel.style.visibility = `hidden`;
+                favnavdropdown.style.visibility = `hidden`;
                 localStorage.removeItem(`activeFav`);
             });
         }
 
         function handleBranding(){
-            let nav = document.getElementById(`nav`);
-            let fav = document.getElementById(`fav`);
-            let settingsbutton = document.getElementById(`settings`);
-            let midcontainer = document.getElementById(`midcontainer`);
-            let logo = document.getElementById(`logo`);
-            let version = document.getElementById(`version`);
-            let toolBranding = document.getElementById(`toolbranding`);
-            let vivintBrandingPosition = document.getElementById(`vivintbranding`);
-
             if(window.innerWidth < 1215){
                 logo.style.right = `43%`;
                 version.hidden = true;
@@ -1034,7 +1050,7 @@
                 fav.innerText = `Favs`;
                 nav.innerText = `Nav`;
             }else{
-                logo.style.right = `1.5rem`
+                logo.style.right = `1.5rem`;
                 version.hidden = false;
                 toolBranding.hidden = false;
                 vivintBrandingPosition.style.position = `relative`;
@@ -1055,14 +1071,11 @@
 
         function importItems(){
             closeDialog();
-            let dialog = document.querySelector(`#importdialog`);
-            dialog.style.display = `block`;
-
+            importdialog.style.display = `block`;
         };
 
         function loadFavNav(){
             let favoriteButtons = JSON.parse(localStorage.favoriteButtons);
-            let favNavCells = document.getElementById(`favnavcells`);
 
             favnavempty.style.visibility = favoriteButtons.length >= 1 ? `hidden` : `visible`;
 
@@ -1084,11 +1097,8 @@
 
         function loadSections(){
             let allSections = JSON.parse(localStorage.allSections);
-            let midcontainer = document.getElementById(`midcontainer`);
-            let midnav = document.getElementById(`midnav`);
 
             if(!localStorage.allSections || localStorage.allSections === `[]`){
-                let midempty = document.getElementById(`midempty`);
                 midempty.style.visibility = `visible`;
             }
 
@@ -1151,7 +1161,6 @@
 
         function loadSideNav(){
             let allSections = JSON.parse(localStorage.allSections);
-            let sideNavCells = document.getElementById(`sidenavcells`);
 
             while (sideNavCells.firstChild){
                 sideNavCells.removeChild(sideNavCells.firstChild);
@@ -1168,17 +1177,15 @@
             }
         };
 
-        function promptNewButton(id){
+        function promptNewButton(sectionId){
             closeDialog();
-            localStorage.activeSection = id;
-            let dialog = document.querySelector(`#createbuttondialog`);
-            dialog.show();
+            localStorage.activeSection = sectionId;
+            createbuttondialog.show();
         };
 
         function promptNewSection(){
             closeDialog();
-            let dialog = document.querySelector(`#createsectiondialog`);
-            dialog.show();
+            createsectiondialog.show();
         };
 
         function saveText(text, filename){
@@ -1190,16 +1197,14 @@
 
         function settingsMenu(){
             closeDialog();
-            let dialog = document.querySelector(`#settingsdialog`);
-            dialog.style.display = `block`;
+            settingsdialog.style.display = `block`;
         };
 
         function toggleTheme(){
             let currentStatus = localStorage.lightMode;
-            let icon = document.getElementById(`themebutton`);
 
             currentStatus === `disabled` ? enableLightMode() : disableLightMode();
-            icon.className = currentStatus === `disabled` ? `fas fa-sun` : `fas fa-moon`;
+            themebutton.className = currentStatus === `disabled` ? `fas fa-sun` : `fas fa-moon`;
         }
 
         window.onload = function(){
@@ -1209,9 +1214,7 @@
                 this.loadSideNav();
             }else{
                 localStorage.allSections = `[]`;
-                let midempty = document.getElementById(`midempty`);
                 midempty.style.visibility = `visible`;
-                let favnavempty = document.getElementById(`favnavempty`);
                 favnavempty.style.visibility = `visible`;
             }
 
@@ -1219,18 +1222,16 @@
                 this.loadFavNav();
             }else{
                 localStorage.favoriteButtons = `[]`;
-                let favnavempty = document.getElementById(`favnavempty`);
                 favnavempty.style.visibility = `visible`;
             }
 
-            let icon = document.getElementById(`themebutton`);
             let currentStatus = localStorage.lightMode;
 
             currentStatus === `enabled` ? enableLightMode() : 0;
-            icon.className = currentStatus === `enabled` ? `fas fa-sun` : `fas fa-moon`;
+            themebutton.className = currentStatus === `enabled` ? `fas fa-sun` : `fas fa-moon`;
         };
 
-        window.onresize = function(event){
+        window.onresize = function(e){
             this.handleBranding();
         };
     </script>
