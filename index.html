@@ -754,26 +754,26 @@
 
         let buttonNameInput = document.getElementById(`buttonNameInput`);
         let buttonPasteValue = document.getElementById(`buttonPasteValue`);
-        let createbuttondialog = document.getElementById(`createbuttondialog`);
-        let createsectiondialog = document.getElementById(`createsectiondialog`);
-        let exportdialog = document.getElementById(`exportdialog`);
+        let createButtonDialog = document.getElementById(`createbuttondialog`);
+        let createSectionDialog = document.getElementById(`createsectiondialog`);
+        let exportDialog = document.getElementById(`exportdialog`);
         let fav = document.getElementById(`fav`);
         let favDel = document.getElementById(`favdel`);
         let favNavCells = document.getElementById(`favnavcells`);
-        let favnavempty = document.getElementById(`favnavempty`);
-        let favnavdropdown = document.getElementById(`favnavdropdown`);
-        let importdialog = document.getElementById(`importdialog`);
+        let favNavEmpty = document.getElementById(`favnavempty`);
+        let favNavDropdown = document.getElementById(`favnavdropdown`);
+        let importDialog = document.getElementById(`importdialog`);
         let logo = document.getElementById(`logo`);
-        let midempty = document.getElementById(`midempty`);
-        let midcontainer = document.getElementById(`midcontainer`);
-        let midnav = document.getElementById(`midnav`);
+        let midEmpty = document.getElementById(`midempty`);
+        let midContainer = document.getElementById(`midcontainer`);
+        let midNav = document.getElementById(`midnav`);
         let nav = document.getElementById(`nav`);
         let popup = document.getElementById(`popup`);
         let sectionNameInput = document.getElementById(`sectionNameInput`);
-        let settingsdialog = document.getElementById(`settingsdialog`);
-        let settingsbutton = document.getElementById(`settings`);
+        let settingsDialog = document.getElementById(`settingsdialog`);
+        let settingsButton = document.getElementById(`settings`);
         let sideNavCells = document.getElementById(`sidenavcells`);
-        let themebutton = document.getElementById(`themebutton`);
+        let themeButton = document.getElementById(`themebutton`);
         let toolBranding = document.getElementById(`toolbranding`);
         let version = document.getElementById(`version`);
         let vivintBrandingPosition = document.getElementById(`vivintbranding`);
@@ -806,11 +806,11 @@
         };
 
         function closeDialog(){
-            createsectiondialog.close();
-            createbuttondialog.close();
-            settingsdialog.style.display = `none`;
-            importdialog.style.display = `none`;
-            exportdialog.style.display = `none`;
+            createSectionDialog.close();
+            createButtonDialog.close();
+            settingsDialog.style.display = `none`;
+            importDialog.style.display = `none`;
+            exportDialog.style.display = `none`;
         }
 
         function confirmExport(){
@@ -896,7 +896,7 @@
             let newSection = JSON.parse(`{"sectionName": "${newSectionName}","sectionButtons": []}`);
             allSections.push(newSection);
             localStorage.allSections = JSON.stringify(allSections);
-            midempty.style.visibility = `hidden`;
+            midEmpty.style.visibility = `hidden`;
             loadSections();
             loadSideNav();
             sectionNameInput.value = ``;
@@ -965,7 +965,7 @@
             for (let i = 0; i < c.length; i++){
                 c[i].remove();
             }
-            exportdialog.style.display = `block`;
+            exportDialog.style.display = `block`;
             if(!localStorage.allSections || localStorage.allSections != `[]`){
                 let node = document.createElement(`div`);
                 let allSections = JSON.parse(localStorage.allSections);
@@ -1030,12 +1030,12 @@
             event.preventDefault();
             let mouseX = window.innerWidth - event.clientX;
             let mouseY = event.clientY - 40;
-            favnavdropdown.style.top = `${mouseY}px`;
-            favnavdropdown.style.visibility = `visible`;
-            favnavdropdown.style.display = `block`;
+            favNavDropdown.style.top = `${mouseY}px`;
+            favNavDropdown.style.visibility = `visible`;
+            favNavDropdown.style.display = `block`;
             localStorage.activeFav = `{"button": "${buttonId}"}`;
             window.addEventListener(`click`, function(){
-                favnavdropdown.style.visibility = `hidden`;
+                favNavDropdown.style.visibility = `hidden`;
                 localStorage.removeItem(`activeFav`);
             });
         }
@@ -1059,8 +1059,8 @@
                 nav.innerText = `Navigation`;
             }
 
-            for (let i = 0; i < midcontainer.children.length; i++){
-                let child = midcontainer.children[i];
+            for (let i = 0; i < midContainer.children.length; i++){
+                let child = midContainer.children[i];
 
                 for (let j = 0; j < child.children.length; j++){
                     let button = child.children[j];
@@ -1071,13 +1071,13 @@
 
         function importItems(){
             closeDialog();
-            importdialog.style.display = `block`;
+            importDialog.style.display = `block`;
         };
 
         function loadFavNav(){
             let favoriteButtons = JSON.parse(localStorage.favoriteButtons);
 
-            favnavempty.style.visibility = favoriteButtons.length >= 1 ? `hidden` : `visible`;
+            favNavEmpty.style.visibility = favoriteButtons.length >= 1 ? `hidden` : `visible`;
 
             while (favNavCells.firstChild){
                 favNavCells.removeChild(favNavCells.firstChild);
@@ -1099,13 +1099,13 @@
             let allSections = JSON.parse(localStorage.allSections);
 
             if(!localStorage.allSections || localStorage.allSections === `[]`){
-                midempty.style.visibility = `visible`;
+                midEmpty.style.visibility = `visible`;
             }
 
-            allSections.length >= 5 ? midnav.style.overflowY = `visible` : midnav.style.webkit = `hidden`;
+            allSections.length >= 5 ? midNav.style.overflowY = `visible` : midNav.style.webkit = `hidden`;
 
-            while (midcontainer.firstChild){
-                midcontainer.removeChild(midcontainer.firstChild);
+            while (midContainer.firstChild){
+                midContainer.removeChild(midContainer.firstChild);
             }
 
             for (let i = 0; i < allSections.length; i++){
@@ -1133,7 +1133,7 @@
                 titleButtonsDiv.appendChild(deleteSection);
                 titleButtonsDiv.appendChild(addButton);
 
-                midcontainer.appendChild(sectionDiv);
+                midContainer.appendChild(sectionDiv);
                 sectionDiv.appendChild(titleDiv);
                 sectionDiv.appendChild(titleButtonsDiv);
                 sectionDiv.appendChild(hr);
@@ -1180,12 +1180,12 @@
         function promptNewButton(sectionId){
             closeDialog();
             localStorage.activeSection = sectionId;
-            createbuttondialog.show();
+            createButtonDialog.show();
         };
 
         function promptNewSection(){
             closeDialog();
-            createsectiondialog.show();
+            createSectionDialog.show();
         };
 
         function saveText(text, filename){
@@ -1197,14 +1197,14 @@
 
         function settingsMenu(){
             closeDialog();
-            settingsdialog.style.display = `block`;
+            settingsDialog.style.display = `block`;
         };
 
         function toggleTheme(){
             let currentStatus = localStorage.lightMode;
 
             currentStatus === `disabled` ? enableLightMode() : disableLightMode();
-            themebutton.className = currentStatus === `disabled` ? `fas fa-sun` : `fas fa-moon`;
+            themeButton.className = currentStatus === `disabled` ? `fas fa-sun` : `fas fa-moon`;
         }
 
         window.onload = function(){
@@ -1214,21 +1214,21 @@
                 this.loadSideNav();
             }else{
                 localStorage.allSections = `[]`;
-                midempty.style.visibility = `visible`;
-                favnavempty.style.visibility = `visible`;
+                midEmpty.style.visibility = `visible`;
+                favNavEmpty.style.visibility = `visible`;
             }
 
             if(localStorage.favoriteButtons && localStorage.favoriteButtons != `[]`){
                 this.loadFavNav();
             }else{
                 localStorage.favoriteButtons = `[]`;
-                favnavempty.style.visibility = `visible`;
+                favNavEmpty.style.visibility = `visible`;
             }
 
             let currentStatus = localStorage.lightMode;
 
             currentStatus === `enabled` ? enableLightMode() : 0;
-            themebutton.className = currentStatus === `enabled` ? `fas fa-sun` : `fas fa-moon`;
+            themeButton.className = currentStatus === `enabled` ? `fas fa-sun` : `fas fa-moon`;
         };
 
         window.onresize = function(e){
