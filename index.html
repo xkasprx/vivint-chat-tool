@@ -223,6 +223,13 @@
             cursor: pointer;
         }
 
+        #editbuttondialog textarea {
+            margin-left: 20px;
+            font-family: Poppins;
+            height: 100px;
+            width: 300px;
+        }
+        
         #favdel{
             position: fixed;
             visibility: hidden;
@@ -457,9 +464,10 @@
         /* Bundles */
         #createsectiondialog,
         #createbuttondialog,
-        #settingsdialog,
+        #editbuttondialog,
+        #exportdialog,
         #importdialog,
-        #exportdialog{
+        #settingsdialog{
             z-index: 5;
             color: var(--color1);
             font-weight: 600;
@@ -583,7 +591,7 @@
             <h1 id="vivintbranding">vivint.SmartHome</h1>
         </span>
         <span class="topbannerbranding">
-            <h2 id="version">Version 2.3.8</h2>
+            <h2 id="version">Version 2.4.0</h2>
         </span>
         <span id="logo">
             <svg width="84" height="19" viewBox="0 0 84 19" xmlns="http://www.w3.org/2000/svg" class="vivint-logo"
@@ -651,6 +659,7 @@
         </div>
         <div id="favdel">
             <p onclick="addFavorite()">Favorite</p>
+            <p onclick="editButton()">Edit</p>
             <p onclick="deleteButton()">Delete</p>
         </div>
         <div id="midcontainer">
@@ -680,6 +689,16 @@
         <br>
         <button onclick="createButton()">Submit</button>
         <button class="cancel" onclick="closeDialog()">Cancel</button>
+    </dialog>
+    <dialog id="editbuttondialog">
+        <p>Please enter the new button name:</p>
+        <input type="text" name="editNameInput" id="editNameInput" hint="Name"></input>
+        <br>
+        <p>Please enter the new button paste value:</p>
+        <textarea name="editPasteValue" id="editPasteValue" hint="Paste Value"></textarea>
+        <br>
+        <button class="cancel" onclick="closeDialog()">Cancel</button>
+        <button id="editSubmitButton">Submit</button>
     </dialog>
     <dialog id="settingsdialog">
         <p>Settings</p>
@@ -749,6 +768,12 @@
     </div>
     <script>
         let body = document.body;
+        let activeButtonID;
+        let activeSectionID;
+        let newButtonName;
+        let newButtonValue;
+        let oldButtonName;
+        let oldButtonValue;
 
         let lightMode = localStorage.getItem(`lightMode`);
 
@@ -756,6 +781,9 @@
         let buttonPasteValue = document.getElementById(`buttonPasteValue`);
         let createButtonDialog = document.getElementById(`createbuttondialog`);
         let createSectionDialog = document.getElementById(`createsectiondialog`);
+        let editbuttondialog = document.getElementById(`editbuttondialog`);
+        let editNameInput = document.getElementById(`editNameInput`);
+        let editPasteValue = document.getElementById(`editPasteValue`);
         let exportDialog = document.getElementById(`exportdialog`);
         let fav = document.getElementById(`fav`);
         let favDel = document.getElementById(`favdel`);
@@ -777,6 +805,8 @@
         let toolBranding = document.getElementById(`toolbranding`);
         let version = document.getElementById(`version`);
         let vivintBrandingPosition = document.getElementById(`vivintbranding`);
+
+        let editSubmitButton = document.querySelector(`#editSubmitButton`);
 
         let deleteAllString = `THIS WILL DELETE ALL OF YOUR SECTIONS AND THEIR BUTTONS!\n\nAre you sure you want to delete all sections and all of their buttons?`;
 
@@ -808,6 +838,7 @@
         function closeDialog(){
             createSectionDialog.close();
             createButtonDialog.close();
+            editbuttondialog.style.display = `none`;
             settingsDialog.style.display = `none`;
             importDialog.style.display = `none`;
             exportDialog.style.display = `none`;
@@ -909,11 +940,25 @@
             let favoriteButtons = JSON.parse(localStorage.favoriteButtons);
 
             delete allSections[activeButton.section].sectionButtons[activeButton.button];
+
+            for(let i = 0; i < favoriteButtons.length; i++){
+                let existingFav = favoriteButtons[i];
+
+                if(existingFav.sectionId === activeButton.section && existingFav.buttonId === activeButton.button){
+                    delete favoriteButtons[i];
+                    favoriteButtons.splice(i, 1);
+                }
+            }
+
             allSections[activeButton.section].sectionButtons.splice(activeButton.button, 1);
             localStorage.allSections = JSON.stringify(allSections);
+            localStorage.favoriteButtons = JSON.stringify(favoriteButtons);
+
             localStorage.removeItem(`activeButton`);
-            loadFavNav();
             loadSections();
+            loadFavNav();
+            loadSideNav();
+            closeDialog();
         };
 
         function deleteFavorite(){
@@ -952,6 +997,23 @@
         function disableLightMode(){
             body.classList.remove(`light`);
             localStorage.setItem(`lightMode`, `disabled`);
+        }
+
+        function editButton(){
+            let allSections = JSON.parse(localStorage.allSections);
+            let activeButton = JSON.parse(localStorage.activeButton);
+            let newButtonName = buttonNameInput.value;
+            let newButtonDescription = JSON.stringify(buttonPasteValue.value);
+            
+            activeSectionID = activeButton.section;
+            activeButtonID = activeButton.button;
+            let actualActiveButton = allSections[activeSectionID].sectionButtons[activeButtonID];
+            let oldButtonName = actualActiveButton.buttonName;
+            let oldButtonValue = actualActiveButton.pasteValue;
+            promptEditButton();
+            editNameInput.value = oldButtonName;
+            editPasteValue.value = oldButtonValue;
+            editSubmitButton.setAttribute('onclick', 'saveButton()');
         }
 
         function enableLightMode(){
@@ -1177,6 +1239,11 @@
             }
         };
 
+        function promptEditButton() {
+            closeDialog();
+            editbuttondialog.style.display = 'block';
+        };
+
         function promptNewButton(sectionId){
             closeDialog();
             localStorage.activeSection = sectionId;
@@ -1193,6 +1260,34 @@
             a.setAttribute(`href`, `data:text/plain;charset=utf-u,${encodeURIComponent(text)}`);
             a.setAttribute(`download`, filename);
             a.click();
+        }
+
+        function saveButton(){
+            let allSections = JSON.parse(localStorage.allSections);
+            let currentFavorites = JSON.parse(localStorage.favoriteButtons);
+            newButtonName = editNameInput.value;
+            newButtonValue = editPasteValue.value;
+            allSections[activeSectionID].sectionButtons[activeButtonID].buttonName = newButtonName;
+            allSections[activeSectionID].sectionButtons[activeButtonID].pasteValue = newButtonValue;
+            localStorage.allSections = JSON.stringify(allSections);
+
+            for(let i = 0; i < currentFavorites.length; i++){
+                let existingFav = currentFavorites[i];
+
+                if(existingFav.sectionId === activeSectionID && existingFav.buttonId === activeButtonID){
+                    existingFav.buttonName = newButtonName;
+                    existingFav.pasteValue = newButtonValue;
+                }
+            }
+
+            localStorage.favoriteButtons = JSON.stringify(currentFavorites);
+
+            loadSections();
+            loadFavNav();
+            loadSideNav();
+            closeDialog();
+            activeSectionID = -1;
+            activeButtonID = -1;
         }
 
         function settingsMenu(){
