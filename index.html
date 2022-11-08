@@ -863,6 +863,7 @@
                     loadFavNav();
                     loadSections();
                     loadSideNav();
+                    location.reload();
                 }
             }else{
                 alert(`There are no sections to delete!`);
@@ -899,6 +900,7 @@
             });
             saveText(JSON.stringify(exportjson), `chatToolExport.json`);
             closeDialog();
+            location.reload();
         }
 
         function confirmSectionReorder(){
@@ -950,6 +952,7 @@
                 localStorage.allSections = JSON.stringify(newSections);
                 loadSections();
                 closeDialog();
+                location.reload();
             }
         };
 
@@ -1002,6 +1005,7 @@
             buttonPasteValue.value = ``;
             localStorage.removeItem(`activeSection`);
             closeDialog();
+            location.reload();
         };
 
         function createSection(){
@@ -1015,6 +1019,7 @@
             loadSideNav();
             sectionNameInput.value = ``;
             closeDialog();
+            location.reload();
         };
 
         function deleteButton(){
@@ -1042,6 +1047,7 @@
             loadFavNav();
             loadSideNav();
             closeDialog();
+            location.reload();
         };
 
         function deleteFavorite(){
@@ -1052,6 +1058,7 @@
             localStorage.favoriteButtons = JSON.stringify(favoriteButtons);
             localStorage.removeItem(`activeFav`);
             loadFavNav();
+            location.reload();
         };
 
         function deleteSection(sectionId){
@@ -1074,6 +1081,7 @@
                 loadFavNav();
                 loadSections();
                 loadSideNav();
+                location.reload();
             }
         };
 
@@ -1341,6 +1349,7 @@
             a.setAttribute(`href`, `data:text/plain;charset=utf-u,${encodeURIComponent(text)}`);
             a.setAttribute(`download`, filename);
             a.click();
+            location.reload();
         }
 
         function saveButton(){
@@ -1369,6 +1378,7 @@
             closeDialog();
             activeSectionID = -1;
             activeButtonID = -1;
+            location.reload();
         }
 
         function settingsMenu(){
