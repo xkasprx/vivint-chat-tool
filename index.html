@@ -611,7 +611,7 @@
             <h1 id="vivintbranding">vivint.SmartHome</h1>
         </span>
         <span class="topbannerbranding">
-            <h2 id="version">Version 2.5.2</h2>
+            <h2 id="version">Version 2.5.4</h2>
         </span>
         <span id="logo">
             <svg width="84" height="19" viewBox="0 0 84 19" xmlns="http://www.w3.org/2000/svg" class="vivint-logo"
@@ -840,6 +840,24 @@
 
         let deleteAllString = `THIS WILL DELETE ALL OF YOUR SECTIONS AND THEIR BUTTONS!\n\nAre you sure you want to delete all sections and all of their buttons?`;
 
+        document.addEventListener(`click`, (e) => {
+            for (i = 0; i < allDialogs.length; i++){
+                let dialog = allDialogs[i];
+                let target = e.target;
+                let hrElement = target.outerHTML === `<hr>`;
+                let dialogShowing = dialog.style.display && dialog.style.display !== `none`;
+                let dialogOpen = dialog.open;
+                let dialogNotTarget = dialog !== target;
+                let targetNotElementOfDialog = target.onclick === null && target.localName !==`textarea` && target.localName !== `input` && !hrElement;
+
+                if(dialogShowing && dialogNotTarget && targetNotElementOfDialog){
+                    dialog.style.display = `none`;
+                }else if(dialogOpen && dialogNotTarget && targetNotElementOfDialog){
+                    dialog.close();
+                }
+            }
+        });
+        
         function addFavorite(){
             let allSections = JSON.parse(localStorage.allSections);
             let activeButton = JSON.parse(localStorage.activeButton);
@@ -863,7 +881,6 @@
                     loadFavNav();
                     loadSections();
                     loadSideNav();
-                    location.reload();
                 }
             }else{
                 alert(`There are no sections to delete!`);
@@ -871,16 +888,18 @@
         };
 
         function closeDialog(){
-            for (i = 0; i < allDialogs.length; i++){
-                allDialogs[i].style.display = `none`;
-            }
+            createSectionDialog.close();
+            createButtonDialog.close();
+            settingsDialog.style.display = `none`;
+            importDialog.style.display = `none`;
+            exportDialog.style.display = `none`;
         }
 
         function confirmExport(){
             let boxes = document.querySelectorAll(`input[name=section]:checked`);
             let exportedsections = [];
             let exportjson = [];
-            if(document.querySelector(`#allsections`).checked == true){
+            if(document.querySelector(`#allsections`).checked === true){
                 document.querySelectorAll(`input[name=section]`).checked = false;
 
                 let sections = JSON.parse(localStorage.allSections);
@@ -900,7 +919,6 @@
             });
             saveText(JSON.stringify(exportjson), `chatToolExport.json`);
             closeDialog();
-            location.reload();
         }
 
         function confirmSectionReorder(){
@@ -994,6 +1012,7 @@
         };
 
         function createButton(){
+            closeDialog();
             let allSections = JSON.parse(localStorage.allSections);
             let newButtonName = buttonNameInput.value;
             let newButtonDescription = JSON.stringify(buttonPasteValue.value);
@@ -1004,11 +1023,10 @@
             buttonNameInput.value = ``;
             buttonPasteValue.value = ``;
             localStorage.removeItem(`activeSection`);
-            closeDialog();
-            location.reload();
         };
 
         function createSection(){
+            closeDialog();
             let allSections = JSON.parse(localStorage.allSections);
             let newSectionName = sectionNameInput.value;
             let newSection = JSON.parse(`{"sectionName": "${newSectionName}","sectionButtons": []}`);
@@ -1018,8 +1036,6 @@
             loadSections();
             loadSideNav();
             sectionNameInput.value = ``;
-            closeDialog();
-            location.reload();
         };
 
         function deleteButton(){
@@ -1047,7 +1063,6 @@
             loadFavNav();
             loadSideNav();
             closeDialog();
-            location.reload();
         };
 
         function deleteFavorite(){
@@ -1080,7 +1095,6 @@
                 loadFavNav();
                 loadSections();
                 loadSideNav();
-                location.reload();
             }
         };
 
@@ -1335,11 +1349,13 @@
         };
 
         function promptNewButton(sectionId){
+            closeDialog();
             localStorage.activeSection = sectionId;
             createButtonDialog.show();
         };
 
         function promptNewSection(){
+            closeDialog();
             createSectionDialog.show();
         };
 
@@ -1348,7 +1364,6 @@
             a.setAttribute(`href`, `data:text/plain;charset=utf-u,${encodeURIComponent(text)}`);
             a.setAttribute(`download`, filename);
             a.click();
-            location.reload();
         }
 
         function saveButton(){
@@ -1377,7 +1392,6 @@
             closeDialog();
             activeSectionID = -1;
             activeButtonID = -1;
-            location.reload();
         }
 
         function settingsMenu(){
